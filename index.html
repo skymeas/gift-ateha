@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Live Overlay - Balanced Oval</title>
+    <style>
+        * { box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+        body {
+            background-color: transparent; 
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center; 
+            justify-content: flex-start;
+            padding-left: 30px;
+            overflow: hidden;
+            font-family: 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+        }
+
+        #overlay-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px; 
+            width: 400px;
+            position: relative;
+        }
+
+        .gift-row {
+            display: flex;
+            align-items: center;
+            height: 90px; /* Ruang baris lebih lega */
+            position: relative;
+            width: 100%;
+        }
+
+        .gift-card {
+            background: rgba(0, 0, 0, 0.3); 
+            backdrop-filter: blur(8px);
+            border-radius: 50px; 
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+            
+            /* UKURAN DISESUAIKAN: LEBIH TINGGI AGAR HADIAH MASUK */
+            width: 320px !important; 
+            height: 75px !important; /* Naik dari 65px ke 75px */
+            
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            
+            position: absolute;
+            left: 0;
+            
+            animation: slideIn 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.1) forwards;
+            transition: all 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .slide-out-left {
+            transform: translateX(-150%) !important;
+            opacity: 0 !important;
+            transition: all 0.5s ease-in !important;
+        }
+
+        .info-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding-right: 75px; /* Ruang aman agar teks tidak tertabrak gambar */
+        }
+
+        .avatar {
+            width: 55px; /* Sedikit lebih besar untuk HD */
+            height: 55px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .details {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            line-height: 1.3;
+        }
+
+        .username {
+            font-weight: 700;
+            font-size: 16px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+
+        .action {
+            font-size: 13px;
+            color: #ffd700; 
+            font-weight: 600;
+        }
+
+        /* IKON GIFT: DIKUNCI DI DALAM GARIS */
+        .gift-icon {
+            width: 70px; /* Ukuran dijaga agar tetap di dalam tinggi 75px */
+            height: 70px;
+            position: absolute;
+            right: 8px; /* Jarak aman dari ujung kanan */
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .gift-icon img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain; /* Memastikan gambar tidak terpotong atau keluar */
+        }
+    </style>
+</head>
+<body>
+
+<div id="overlay-container">
+    <div id="row-1" class="gift-row"></div>
+    <div id="row-2" class="gift-row"></div>
+</div>
+
+<script>
+    const maleNames = ["Baim Wong", "Andi Pratama", "Putra", "Eko", "Iqbal", "Asep", "Rizky", "Dedi Mulyadi", "Joko", "Anca", "Herman", "Hamdan", "Khalid", "Omar", "Zayed", "Rashid", "Ali Abbas", "Mohammed", "Hassan", "Yusuf", "Ibrahim", "Abdullah", "Sultan", "Ahmed", "Salem", "Marwan", "Saif", "Qassim", "Mansoor", "Oliver", "James Smith", "George", "William", "Jack", "Thomas", "Leo", "Alf", "Oscar", "Archie", "Arthur", "Charlie", "Freddie", "Teddy", "Lucas", "Alejandro", "Mateo", "Hugo", "Lucas Sanchez", "Daniel", "Alvaro", "Adrian", "Iker", "Sergio", "Pablo"];
+    const femaleNames = ["Siti Rahma", "Dewi Sari", "Rina Jakarta", "Maya", "Puput", "Wati", "Lestari", "Siska", "Cici", "Fatima", "Amira", "Layla", "Noora", "Sara", "Mariam", "Farah", "Hessa", "Reem", "Jawaher", "Latifa", "Moza", "Sophie", "Emily Walker", "Charlotte", "Mia", "Isla", "Ruby", "Poppy", "Sienna", "Grace", "Evie", "Ella", "Chloe", "Mila", "Ivy", "Alice", "Lucia", "Martina", "Sofia", "Paula", "Valeria", "Alba", "Claudia", "Noa", "Elena", "Irene"];
+
+    const priorityGifts = ["Rose.png", "TikTok.png", "Rosa.png", "Finger Heart.png", "Hand Hearts.png", "Lion.png"];
+    const standardGifts = ["Cake Slice.png", "Fairy wings.png", "Fire Phoenix.png", "Flame heart.png", "Friendship Necklace.png", "Game Controller.png", "GG.png", "Hi Bear.png", "Ice Cream Cone.png", "Pegasus.png", "Sports Car.png", "Thunder Falcon.png", "TikTok Universe.png", "Zeus.png", "Signature Jet.png", "Gem Gun.png", "Cheer You Up.png", "Legend Marcellus.png", "TikTok Universee.png", "TikTok Stars.png", "Private Jet.png", "Leon the Kitten.png", "Next Level.png", "Motorcycle.png", "Travel with You.png", "Train.png", "Swan.png", "Trophy.png", "Money Gun.png", "Coral.png", "Sakura Corgi.png", "Confetti.png", "Mishka Bear.png", "Paper Crane.png", "Cap.png", "Hat and Mustache.png", "Bagel.png", "Doughnut.png", "Perfume.png", "Tiny Diny.png", "Blow a kiss.png", "Heart Me.png"];
+
+    function getWeightedGift() {
+        return Math.random() < 0.7 ? priorityGifts[Math.floor(Math.random() * priorityGifts.length)] : standardGifts[Math.floor(Math.random() * standardGifts.length)];
+    }
+
+    function generateGiftData() {
+        const isMale = Math.random() > 0.5;
+        const user = isMale ? maleNames[Math.floor(Math.random() * maleNames.length)] : femaleNames[Math.floor(Math.random() * femaleNames.length)];
+        const gender = isMale ? 'men' : 'women';
+        const avatarUrl = `https://randomuser.me/api/portraits/${gender}/${Math.floor(Math.random() * 95)}.jpg`;
+        const giftFile = getWeightedGift();
+        let giftName = giftFile.replace('.png', '');
+        giftName = giftName.charAt(0).toUpperCase() + giftName.slice(1).toLowerCase();
+        return { user, avatarUrl, giftFile, giftName };
+    }
+
+    function spawnGiftToRow(rowId) {
+        const row = document.getElementById(rowId);
+        if (row.children.length > 0) {
+            const old = row.firstChild;
+            old.classList.add('slide-out-left');
+            setTimeout(() => { if(old.parentNode === row) row.removeChild(old); }, 500);
+        }
+        const d = generateGiftData();
+        const card = document.createElement('div');
+        card.className = 'gift-card';
+        card.innerHTML = `<div class="info-group"><img class="avatar" src="${d.avatarUrl}"><div class="details"><div class="username">${d.user}</div><div class="action">Sent ${d.giftName}</div></div></div><div class="gift-icon"><img src="${d.giftFile}" alt="${d.giftName}"></div>`;
+        row.appendChild(card);
+    }
+
+    function loop1() { spawnGiftToRow('row-1'); setTimeout(loop1, Math.random() * 3000 + 4000); }
+    function loop2() { spawnGiftToRow('row-2'); setTimeout(loop2, Math.random() * 3000 + 2500); }
+    window.onload = () => { loop1(); setTimeout(loop2, 2000); };
+</script>
+
+</body>
+</html>
